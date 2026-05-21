@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <title>शिक्षा खेल</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; background-color: #f0f2f5; }
+        .box { background: white; padding: 15px; margin: 10px auto; border-radius: 12px; width: 80%; max-width: 500px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .dice { width: 80px; height: 80px; margin: 10px auto; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; border-radius: 10px; }
+        .card { width: 60px; height: 60px; display: inline-block; margin: 5px; cursor: pointer; border: 2px solid #333; border-radius: 5px; }
+        .options button { margin: 5px; padding: 8px 12px; cursor: pointer; }
+        #timer { font-weight: bold; color: red; }
+    </style>
+</head>
+<body>
+
+    <div class="box">
+        <h3>स्कोर: <span id="score">0</span> | समय: <span id="timer">10</span>s</h3>
+        <div id="dice" class="dice">पासा</div>
+    </div>
+
+    <div class="box">
+        <div id="subject-display" style="font-size: 1.2em; color: blue;">पासे के रंग का कार्ड चुनें!</div>
+        <div id="cards"></div>
+    </div>
+
+    <div class="box">
+        <div class="options" id="authors"></div>
+    </div>
+
+    <script>
+        const data = [
+            { color: 'red', subject: 'अर्थशास्त्र', author: 'चाणक्य' },
+            { color: 'blue', subject: 'रामचरितमानस', author: 'तुलसीदास' },
+            { color: 'green', subject: 'गीतांजलि', author: 'रवीन्द्रनाथ टैगोर' },
+            { color: 'yellow', subject: 'कामायनी', author: 'जयशंकर प्रसाद' },
+            { color: 'purple', subject: 'गोदान', author: 'प्रेमचंद' },
+            { color: 'orange', subject: 'महाभारत', author: 'वेदव्यास' }
+        ];
+
+        let score = 0;
+        let timeLeft = 10;
+        let currentData = null;
+        let timerInterval;
+
+        function updateDice() {
+            currentData = data[Math.floor(Math.random() * data.length)];
+            const dice = document.getElementById('dice');
+            dice.style.backgroundColor = currentData.color;
+            dice.innerText = "?";
+            resetTimer();
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            timeLeft = 10;
+            document.getElementById('timer').innerText = timeLeft;
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timer').innerText = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    alert("समय समाप्त! गेम ओवर।");
+                    score = 0;
+                    document.getElementById('score').innerText = score;
+                    updateDice();
+                }
+            }, 1000);
+        }
+
+        // Setup UI
+        const cardContainer = document.getElementById('cards');
+        data.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'card';
+            div.style.backgroundColor = item.color;
+            div.onclick = () => {
+                if(item.color === currentData.color) {
+                    document.getElementById('subject-display').innerText = "विषय: " + item.subject;
+                }
+            };
+            cardContainer.appendChild(div);
+        });
+
+        const authors = ['चाणक्य', 'तुलसीदास', 'रवीन्द्रनाथ टैगोर', 'जयशंकर प्रसाद', 'प्रेमचंद', 'वेदव्यास', 'कालिदास', 'सूरदास'];
+        const authorContainer = document.getElementById('authors');
+        authors.forEach(name => {
+            const btn = document.createElement('button');
+            btn.innerText = name;
+            btn.onclick = () => {
+                if(currentData && name === currentData.author) {
+                    score += 10;
+                    alert("सही जवाब! +10 अंक");
+                } else {
+                    score -= 5;
+                    alert("गलत जवाब! -5 अंक");
+                }
+                document.getElementById('score').innerText = score;
+                updateDice();
+            };
+            authorContainer.appendChild(btn);
+        });
+
+        setInterval(updateDice, 5000); // पासा हर 5 सेकंड में घूमेगा
+        updateDice();
+    </script>
+</body>
+</html>
